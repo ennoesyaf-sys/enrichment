@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Elementary Test 1 – Grammar Quiz</title>
+<style>
+:root{color-scheme:light;--bg:#f6f7fb;--card:#fff;--tx:#1d2433;--mu:#667085;--ac:#2f6fed;--acx:#fff;--ok:#16794c;--okb:#e3f6ec;--no:#b42318;--nob:#fde8e6;--bd:#d9dde7;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#14171f;--card:#1e2330;--tx:#eef1f7;--mu:#9aa3b5;--ac:#6b9bff;--acx:#0d1424;--ok:#5fd69b;--okb:#17352a;--no:#ff8f85;--nob:#3b1d1a;--bd:#363d50}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#14171f;--card:#1e2330;--tx:#eef1f7;--mu:#9aa3b5;--ac:#6b9bff;--acx:#0d1424;--ok:#5fd69b;--okb:#17352a;--no:#ff8f85;--nob:#3b1d1a;--bd:#363d50}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:640px;margin:0 auto;padding:20px 16px 48px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:20px;margin-bottom:16px}
+h1{font-size:1.4rem;margin:0 0 4px}h2{font-size:1.15rem;margin:0 0 12px}
+.mu{color:var(--mu);font-size:.9rem}
+label{display:block;font-weight:600;margin:14px 0 4px}
+input{width:100%;padding:11px 12px;font:inherit;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx)}
+button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:10px 16px}
+button.p{background:var(--ac);color:var(--acx);border-color:var(--ac);font-weight:600}
+button:disabled{opacity:.45;cursor:default}
+.bar{height:8px;background:var(--bd);border-radius:6px;overflow:hidden;margin:8px 0 16px}.bar i{display:block;height:100%;background:var(--ac);transition:width .2s}
+.q{font-size:1.15rem;font-weight:600;margin:0 0 14px}
+.opt{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;margin-bottom:8px;padding:12px}
+.opt b{min-width:1.4em}.opt.sel{border-color:var(--ac);outline:2px solid var(--ac)}
+.nav{display:flex;justify-content:space-between;gap:8px;margin-top:14px}
+.dots{display:flex;flex-wrap:wrap;gap:5px;margin-top:16px}
+.dots button{width:30px;height:30px;padding:0;font-size:.75rem}.dots .done{background:var(--ac);color:var(--acx);border-color:var(--ac)}.dots .cur{outline:2px solid var(--tx)}
+.score{font-size:2.6rem;font-weight:800;text-align:center;margin:4px 0}
+.rev{border-left:4px solid var(--no);background:var(--nob);padding:10px 12px;border-radius:8px;margin:8px 0;font-size:.95rem}
+.rev.ok{border-color:var(--ok);background:var(--okb)}
+.st{padding:10px 12px;border-radius:10px;margin:12px 0;font-size:.95rem}.st.ok{background:var(--okb);color:var(--ok)}.st.no{background:var(--nob);color:var(--no)}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{padding:7px 8px;border-bottom:1px solid var(--bd);text-align:left;white-space:nowrap}
+.hide{display:none}
+</style>
+</head>
+<body>
+<main>
+<div id="start" class="card">
+  <h1>Elementary Test 1</h1>
+  <p class="mu">Verb to be · Possessive adjectives · Subject pronouns · Articles · Plural nouns &amp; numbers — 44 questions</p>
+  <label for="nm">Student name</label><input id="nm" autocomplete="name" placeholder="Your full name">
+  <label for="cl">Class</label><input id="cl" placeholder="e.g. Runner, Dasher, 7A">
+  <p id="err" class="st no hide"></p>
+  <button class="p" id="go" style="margin-top:16px;width:100%">Start quiz</button>
+  <p class="mu" style="margin-top:14px">Choose the best answer. The sign “–” means no article is needed.</p>
+  </div>
+
+<div id="quiz" class="card hide">
+  <div class="mu" id="who"></div>
+  <div class="mu" id="prog" style="margin-top:6px"></div>
+  <div class="bar"><i id="pb"></i></div>
+  <p class="q" id="qt"></p>
+  <div id="opts"></div>
+  <div class="nav"><button id="prev">← Back</button><button id="next" class="p">Next →</button></div>
+  <div class="dots" id="dots"></div>
+</div>
+
+<div id="res" class="card hide">
+  <h2>Result</h2>
+  <div class="score" id="sc"></div>
+  <p class="mu" id="who2" style="text-align:center"></p>
+  <div id="save" class="st"></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap"><button id="dl">Download my result (CSV)</button><button id="again">Try again</button></div>
+  <h2 style="margin-top:22px">Review</h2>
+  <div id="rev"></div>
+</div>
+
+</main>
+
+<script>
+const Q=[
+["A- Hello, what ____ your name?",["is","are","am","be"],"A"],
+["____ name is John. And my ____ is Johnson.",["Your / surname","My / surname","I / surname","I / name"],"B"],
+["My name is Lisa. ____ Lisa Peterson.",["My am","I is","I am","I"],"C"],
+["____ name is Apple. ____ Ann Apple.",["His / She","His / He’s","Her / She’s","His / His"],"C"],
+["“Where ____ John from?” “____ from the US.”",["is / He’s","is / His","am / He’s","is / She’s"],"A"],
+["____ are you from? Japan.",["What","Who","Where","When"],"C"],
+["Where ____ you ____ ?",["is / from","are / in","are / is","are / from"],"D"],
+["____ from Spain. I’m Rodriguez.",["I’m","He’s","You’re","She’s"],"A"],
+["Pierre is a French boy. ____ from ____ .",["He’s / France","His’s / French","His / France","He / France"],"A"],
+["Lisa and Max are Americans. ____ from U.S.A.",["There","Their","They’re","Their’re"],"C"],
+["“What ____ their ____ ?” “Alexander and Philip.”",["are / name","is / name","is / names","are / names"],"D"],
+["I ____ 22 years old, but Andrew ____ 20.",["am / am","are / am","am / is","are / are"],"C"],
+["Mark ____ 19, but Brian and Denis ____ 26 and 28.",["is / are","are / is","are / are","am / are"],"A"],
+["“What ____ this?” “It’s ____ umbrella.”",["are / a","is / a","is / an","its / an"],"C"],
+["Oxford is ____ English university.",["an","the","a","–"],"A"],
+["Toyotas ____ Japanese ____ .",["is a / car","is / car","are / cars","is / cars"],"C"],
+["“What is ____ ?” “She is a bank manager.”",["his job","she job","he job","her job"],"D"],
+["0 / 2 / 11 / 18 / 20 — Find the correct alternative.",["oh / twelve / eighteen / twenty","zero / two / one-one / eighteen / twenty","zero / two / eleven / eighteen / twenty","zero / two / eleven / eighty / twenty"],"C"],
+["“How old is your aunt?” “____ is 29.”",["She","He","She’s","He’s"],"C"],
+["“Where ____ she from?” “She ____ from Japan.”",["are / is","is / is","is / am","are / are"],"B"],
+["This ____ my friend. ____ name’s Richard.",["are / His","is / My","is / His","his / His"],"C"],
+["They ____ Lisa and Max. They ____ from the USA.",["is / is","are / is","are / are","is / is"],"C"],
+["“What is ____ name?” “My name’s Carlos.”",["his","her","your","my"],"C"],
+["This is my sister. ____ name is Laura.",["His","My","Her","Its"],"C"],
+["I have ____ brother. ____ name is David.",["an / His","a / Her","a / His","– / His"],"C"],
+["Hello! My ____ ____ Maria. I ____ ____ Mexico.",["name is / from am","is name / from am","name is / am from","name am / is from"],"C"],
+["Is Catherine ____ sister?",["he","you","your","yours"],"C"],
+["We ____ students.",["are a","is","are","am"],"C"],
+["I ____ student.",["is / an","am / –","am / a","am / the"],"C"],
+["She ____ Italy.",["are from","is at","is from","am from"],"C"],
+["He is ____ teacher.",["a","an","–","the"],"A"],
+["I live ____ a house ____ Los Angeles.",["– / in","in / in","in / –","at / in"],"B"],
+["“____ is your phone number?” “It’s 2229.”",["Where","How","What","Who"],"C"],
+["“____ are you?” “I’m Alex.”",["Which","How","What","Who"],"D"],
+["What’s this ____ English?",["–","in","at","on"],"B"],
+["Champagne is ____ French drink.",["a","the","an","–"],"A"],
+["Oxford is ____ English university.",["a","an","the","–"],"B"],
+["A Mercedes is ____ German car.",["a","an","the","–"],"A"],
+["English is ____ international language.",["a","an","the","–"],"B"],
+["Milan is ____ Italian city.",["a","an","the","–"],"B"],
+["A JVC is ____ Japanese camera.",["a","an","the","–"],"A"],
+["I have two ____ .",["sister","sisters","a sister","sister’s"],"B"],
+["It’s ____ Spanish orange.",["a","an","the","–"],"A"],
+["It’s ____ green apple.",["a","an","the","–"],"A"]
+];
+const L="ABCD",N=Q.length,$=id=>document.getElementById(id);
+/* ====== SETTING (isi sekali saja) ====== */
+const FORM_URL="PASTE_FORM_RESPONSE_URL_HERE"; // contoh: https://docs.google.com/forms/d/e/XXXX/formResponse
+const ENTRY={name:"entry.0000000001",class:"entry.0000000002",score:"entry.0000000003",percent:"entry.0000000004",answers:"entry.0000000005"};
+/* ======================================= */
+let ans=[],cur=0,name="",cls="",last=null;
+
+function show(id){["start","quiz","res"].forEach(x=>$(x).classList.toggle("hide",x!==id));window.scrollTo(0,0)}
+function csvEsc(v){v=String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
+async function saveCsv(fn,rows){
+  const data="\ufeff"+rows.map(r=>r.map(csvEsc).join(",")).join("\n");
+  try{const d=await claude.use("downloads");if(d){await d.save({filename:fn,data});return}}catch(e){}
+  try{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([data],{type:"text/csv"}));a.download=fn;a.click()}catch(e){}
+}
+
+function render(){
+  const q=Q[cur];
+  $("who").textContent=name+" · "+cls;
+  $("prog").textContent="Question "+(cur+1)+" of "+N+" · answered "+ans.filter(Boolean).length;
+  $("pb").style.width=((cur+1)/N*100)+"%";
+  $("qt").textContent=(cur+1)+". "+q[0];
+  $("opts").innerHTML="";
+  q[1].forEach((t,i)=>{const b=document.createElement("button");b.className="opt"+(ans[cur]===L[i]?" sel":"");
+    const s=document.createElement("b");s.textContent=L[i]+")";const x=document.createElement("span");x.textContent=t;b.append(s,x);
+    b.onclick=()=>{ans[cur]=L[i];render()};$("opts").append(b)});
+  $("prev").disabled=cur===0;
+  $("next").textContent=cur===N-1?"Finish ✓":"Next →";
+  $("dots").innerHTML="";
+  for(let i=0;i<N;i++){const d=document.createElement("button");d.textContent=i+1;d.className=(ans[i]?"done ":"")+(i===cur?"cur":"");d.onclick=()=>{cur=i;render()};$("dots").append(d)}
+}
+
+$("go").onclick=()=>{
+  name=$("nm").value.trim();cls=$("cl").value.trim();
+  if(!name||!cls){$("err").textContent="Please write your name and class first.";$("err").classList.remove("hide");return}
+  $("err").classList.add("hide");ans=new Array(N).fill(null);cur=0;show("quiz");render();
+};
+$("prev").onclick=()=>{if(cur>0){cur--;render()}};
+$("next").onclick=()=>{
+  if(cur<N-1){cur++;render();return}
+  const un=ans.filter(a=>!a).length;
+  if(un&&!confirm(un+" question(s) are not answered. Finish anyway?"))return;
+  finish();
+};
+
+async function finish(){
+  let score=0;const wrong=[];
+  Q.forEach((q,i)=>{if(ans[i]===q[2])score++;else wrong.push(i)});
+  const pct=Math.round(score/N*100);
+  last={name,class:cls,score,total:N,percent:pct,answers:ans.join("").replace(/null/g,"-"),ts:Date.now(),test:"Elementary Test 1"};
+  last.answers=ans.map(a=>a||"-").join("");
+  $("sc").textContent=score+" / "+N+" ("+pct+"%)";
+  $("who2").textContent=name+" · "+cls;
+  const rv=$("rev");rv.innerHTML="";
+  Q.forEach((q,i)=>{const ok=ans[i]===q[2];const d=document.createElement("div");d.className="rev"+(ok?" ok":"");
+    const yours=ans[i]?L.indexOf(ans[i]):-1,k=L.indexOf(q[2]);
+    d.textContent=(ok?"✓ ":"✗ ")+(i+1)+". "+q[0]+"  →  "+(ok?q[1][k]:"your answer: "+(yours>=0?q[1][yours]:"(blank)")+" | correct: "+q[1][k]);
+    rv.append(d)});
+  const st=$("save");st.className="st";st.textContent="Saving your result…";show("res");
+  try{
+    if(FORM_URL.startsWith("PASTE"))throw new Error("nosetup");
+    const f=new FormData();
+    f.append(ENTRY.name,last.name);f.append(ENTRY.class,last.class);f.append(ENTRY.score,last.score+"/"+last.total);
+    f.append(ENTRY.percent,last.percent);f.append(ENTRY.answers,last.answers);
+    await fetch(FORM_URL,{method:"POST",mode:"no-cors",body:f});
+    st.className="st ok";st.textContent="✓ Result sent. Your teacher can see it.";
+  }catch(e){
+    st.className="st no";st.textContent="Could not send online. Please press “Download my result” and send the file to your teacher.";
+  }
+}
+$("dl").onclick=()=>last&&saveCsv("result-"+last.name.replace(/\s+/g,"_")+".csv",[["Date","Name","Class","Test","Score","Total","Percent","Answers"],[new Date(last.ts).toLocaleString(),last.name,last.class,last.test,last.score,last.total,last.percent,last.answers]]);
+$("again").onclick=()=>{ans=new Array(N).fill(null);cur=0;show("quiz");render()};
+
+</script>
+</body>
+</html>
